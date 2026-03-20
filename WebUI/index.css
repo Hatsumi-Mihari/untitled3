@@ -1,0 +1,67 @@
+html{
+    background-color: rgb(15, 15, 15);
+    color: rgb(255, 255, 255);
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.main{
+    display: grid;
+    width: 100wh;
+    height: 80vh;
+    grid-template-rows: min-content min-content;
+    grid-row-gap: 20px;
+    padding: 10px;
+    border: 1px solid rgb(60, 60, 60);
+}
+
+.canvas_d{
+    display: grid;
+    width: auto;
+    height: auto;
+    grid-row: 1;
+    image-rendering: pixelated;
+}
+
+.debug_win{
+    display: grid;
+    grid-template-columns: auto 80%;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+}
+
+.debug_inf{
+    display: grid;
+}
+
+.data_debug_inf{
+    display: grid;
+    grid-template-columns: min-content max-content;
+    grid-template-rows: min-content;
+    font-size: 0.8em;
+}
+
+h3{
+    margin: 0;
+}
+
+p{
+    display: grid;
+    margin: 0;
+}
+
+.title{
+    margin-right: 10px;
+    text-align: right;
+}
+
+.data_st{
+    color: rgb(200, 200, 200);
+}
+
+canvas{
+    display: grid;
+    background-color: rgb(0, 0, 0);
+    border: 1px solid rgb(123, 123, 123) outset;
+}

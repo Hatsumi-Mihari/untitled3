@@ -1,0 +1,41 @@
+.editor_div{
+    display: grid;
+    grid-template-columns: auto auto;
+}
+
+#editor{
+    background-color: #5b5b5b;
+}
+
+.hex-cell {
+    display: grid;
+    width: auto;
+    height: 20px;
+    align-items: center;
+    justify-content: center;
+    background-color: #222222;
+    outline: 2px solid #222222;
+    cursor: text;
+}
+
+.hex-cell:hover {
+    background-color: #565656;
+}
+
+.active-ip {
+    background: #4caf50 !important; 
+    color: white;
+    font-weight: bold;
+    outline: 2px solid #2e7d32;
+}
+
+.hex-cell:focus {
+    background: #888888;
+    outline: 2px solid #2196f3;
+}
+
+.break {
+    display: grid;
+    height: 0;
+    border: none;
+}
