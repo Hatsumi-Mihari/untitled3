@@ -16,8 +16,9 @@ class HexEditor {
     render() {
         this.container.style.display = 'grid';
         this.container.style.gridTemplateColumns = `repeat(${this.bytesPerLine}, 40px)`;
-        this.container.style.gap = '2px';
+        //this.container.style.gap = '2px';
         let counter_wrap = 0;
+        let hightlightSizePayload = 0;
 
         for (let i = 0; i < this.data.length; i++) {
             const cell = document.createElement('div');
@@ -25,17 +26,52 @@ class HexEditor {
             cell.textContent = this.formatHex(this.data[i]);
             cell.dataset.offset = i;
 
+            const idInset = document.createElement('div');
+            idInset.className = 'hex-id';
+
             if (i == this.indexWrap[counter_wrap]) {
-                cell.style.gridColumn = 1;
+                idInset.style.gridColumn = 1;
+                idInset.textContent = this.indexWrap[counter_wrap];
+                idInset.dataset.offset = -1;
+
+                cell.style.gridColumn = 2;
+                cell.classList.add('hex-cell-OPCODE');
                 counter_wrap++;
+                hightlightSizePayload = 2;
+
+                this.container.appendChild(idInset);
+
+            }else if (hightlightSizePayload > 0){
+                cell.classList.add('hex-cell-OPCODE-SIZE');
+                hightlightSizePayload--;
             }
 
             cell.contentEditable = true;
-            cell.oninput = (e) => this.handleInput(i, e.target.textContent);
+            cell.oninput = (e) => {
+                let value = e.target.textContent.toUpperCase();
+                value = value.replace(/[^0-9A-F]/g, '');
 
+                if (value.length > 2) {
+                    value = value.substring(0, 2);
+                }
+
+                if (e.target.textContent !== value) {
+                    e.target.textContent = value;
+
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.setStart(e.target.childNodes[0] || e.target, value.length);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                } 
+
+                this.handleInput(i, value);
+            };
             this.container.appendChild(cell);
             this.cells.push(cell);
         }
+
     }
 
     update(data) {
@@ -47,6 +83,7 @@ class HexEditor {
 
         let cursor = 0;
         let payload_size = 0;
+        this.indexWrap.push(cursor);
 
         while (cursor < data.length) {
             payload_size = ((data[cursor + 1] & 0xFF) << 8) | (data[cursor + 2] & 0xFF);
@@ -80,6 +117,19 @@ class HexEditor {
     }
 
     insert_code(index_insert, opcode_id, payload_size) {
+        let tempIndex = 0;
+        let flag = false;
+        for(let i = 0; i < this.indexWrap.length; i++){
+            if (this.indexWrap[i] == index_insert){
+                flag = true;
+            }
+        }
+
+        if (!flag){
+            alert("Incorect Index incert");
+            return;
+        }
+
         const cmd_size = 3 + payload_size;
         const newData = new Uint8Array(this.data.length + cmd_size);
 
@@ -96,12 +146,12 @@ class HexEditor {
     }
 
     delete_code(index) {
-        const size_block_del = ((this.data[index + 1] & 0xFF) << 8 ) | (this.data[index + 2] & 0xFF);
+        const size_block_del = ((this.data[index + 1] & 0xFF) << 8) | (this.data[index + 2] & 0xFF);
         const newData = new Uint8Array(this.data.length - (size_block_del + 3));
         newData.set(this.data.subarray(0, index), 0);
         newData.set(this.data.subarray(index + (size_block_del + 3)), index);
 
-        this.update(newData); 
+        this.update(newData);
     }
 
     getCode() {

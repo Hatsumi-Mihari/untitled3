@@ -1,10 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="hex_editor.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>EMU_debug</title>
 </head>
+
 <body>
-$END$
+    <div class="main">
+        <div class="canvas_d">
+            <canvas id="screen"></canvas>
+        </div>
+        <div class="debug_win">
+            <div class="debug_inf">
+                <h3>Debug Info</h3>
+                <div class="data_debug_inf">
+                    <p class="title">Version:</p>
+                    <p id="ver" class="data_st">1.0 Alpha (11030056)</p>
+                    <p class="title">FBO_size:</p>
+                    <p id="fbo_size" class="data_st">10x1</p>
+                    <p class="title">FBO_scale:</p>
+                    <p id="fbo_scale" class="data_st">10x</p>
+
+                    <p class="title">tick_update:</p>
+                    <p id="tick_update" class="data_st"></p>
+                    <p class="title">Opcode:</p>
+                    <p id="opcode" class="data_st"></p>
+                    <p class="title">Cursor:</p>
+                    <p id="cursor" class="data_st"></p>
+                </div>
+            </div>
+            <div></div>
+            <div class="debug_inp">
+                <button id="setScaleFBO">Set Scale FBO</button>
+                <button id="setResFBO">Set resulution FBO</button>
+                <button id="setTickRate">Set tickrate update</button>
+                <button id="updateByteCode">Force update byte-code</button>
+                <button id="reset">reset VM</button>
+            </div>
+            <div></div>
+            <div>
+                <h3>Byte Code VM run-time</h3>
+                <div class="editor_div">
+                    <hex-editor id="editor"></hex-editor>
+                    <div class="btns">
+                        <button id="insert">insert</button>
+                        <button id="delete">delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="code-color">
+                <div class="row">
+                    <div class="color-c" style="background-color: #5B4600;"></div>
+                    <div class="data-c">
+                        Incert Byte Index
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="color-c" style="background-color: #015D0A;"></div>
+                    <div class="data-c">
+                        Opcode ID
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="color-c" style="background-color: #000D5C;"></div>
+                    <div class="data-c">
+                        Payload Size
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="hex_editor.js"></script>
+    <script src="index.js"></script>
 </body>
+
 </html>

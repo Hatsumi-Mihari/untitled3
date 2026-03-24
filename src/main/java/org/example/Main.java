@@ -1,17 +1,72 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import GL_Engine.GEngine_Functions;
+import GL_Engine.GEngine_Main;
+import VM.VM_Main;
+import WS_Server.WS_EMU;
+import WS_Server.WS_Main;
+import java.awt.Desktop;
+import java.io.File;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+public class Main {
+    public static void main(String[] args) throws Exception {
+        byte[] bytecode = {
+                (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x10, (byte) 0x00,(byte) 0x05,
+                (byte) 0xFA, (byte) 0x00, (byte) 0x00,
+                (byte) 0x02, (byte) 0x00, (byte) 0x00,
+                (byte) 0x01, (byte) 0x00, (byte) 0x04, (byte) 0xFE, (byte) 0x00, (byte) 0x00,(byte) 0xFF,
+                (byte) 0x01, (byte) 0x00, (byte) 0x04, (byte) 0x90, (byte) 0x00, (byte) 0x00,(byte) 0xFF,
+                (byte) 0xFB, (byte) 0x00, (byte) 0x00,
+        };
+        GEngine_Main glContext = new GEngine_Main(1);
+        GEngine_Functions gl = new GEngine_Functions(glContext);
+
+
+        WS_Main serverDebug = new WS_Main(1204);
+        WS_EMU ws_emu = new WS_EMU(serverDebug, gl);
+        serverDebug.setHandlerProcess(ws_emu::checkEndPoint);
+        serverDebug.start();
+
+        VM_Main vm = new VM_Main(bytecode, gl);
+        vm.setTick(1000);
+        ws_emu.setHandlerSetTickRate(vm::setTick);
+        ws_emu.setHandlerGetByteCodeVM(vm::getByteCodeVM_Debug);
+        ws_emu.setHandlerLoadByteCode(vm::loadByteCode);
+        ws_emu.setHandlerResetVM(vm::resetVM);
+
+        try {
+            String currentDir = System.getProperty("user.dir");
+            File html = new File(currentDir + File.separator + "WebUI" + File.separator + "index.html");
+            Desktop.getDesktop().browse(html.toURI());
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
+        while(true){
+            while (vm.getCursorPos() < vm.getSizeByteCode()){
+                vm.execute();
+                serverDebug.sendTypedBytePkg((byte)0xFE, glContext.render_ByteArr());
+
+                ws_emu.sendDebugData(
+                        "1.3.6 Alpha (2403.0131)",
+                        glContext.getSizeFBO(),
+                        10, vm.getOpcodeNowExec(),
+                        vm.getCursorOpcodePoss(),
+                        vm.getValueTick()
+                );
+
+                Thread.sleep(vm.getValueTick());
+            }
+
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            //vm.returnCursorZero();
+        }
+
     }
 }
