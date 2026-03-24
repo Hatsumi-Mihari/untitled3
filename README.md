@@ -1,4 +1,5 @@
-# Java prototype, render engine, for ESP32 (ver: 1.3.6 Alpha (2403.0131))
+# Java prototype, render engine, for ESP32 
+# Ver: 1.3.6 Alpha (2403.0131)
 <img width="650" height="575" alt="Screenshot 2026-03-24 at 1 55 16 AM" src="https://github.com/user-attachments/assets/d52618d8-4bb4-4497-8b90-eca74890d4e1" />
 
 
