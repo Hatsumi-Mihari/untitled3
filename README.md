@@ -9,7 +9,6 @@
 >The core concept of this engine is to control the rendering process using bytecode that calls all graphics functions and the graphics module via callbacks. Currently, there are only 3 opcodes for triggering the rendering process and 2 opcodes service
 
 | ID_opcode | Name | type |
-
 | ------------- | ------------- | ------------- |
 | 0x00  | ReSizeFBO  | Render  |
 | 0x01  | FillColor | Render  |
