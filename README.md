@@ -8,7 +8,7 @@
 # A brief overview of how the engine works
 >The core concept of this engine is to control the rendering process using bytecode that calls all graphics functions and the graphics module via callbacks. Currently, there are only 3 opcodes for triggering the rendering process and 2 opcodes service
 
-| ID_opcode | Name | type |![Uploading Screenshot 2026-03-23 at 11.37.14 PM.png…]()
+| ID_opcode | Name | type |
 
 | ------------- | ------------- | ------------- |
 | 0x00  | ReSizeFBO  | Render  |
