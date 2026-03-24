@@ -1,5 +1,5 @@
 # Java prototype, render engine, for ESP32
-<img width="1800" height="1169" alt="Screenshot 2026-03-23 at 11 37 14 PM" src="https://github.com/user-attachments/assets/afc05259-0bc5-4075-a88c-680b01e73090" />
+<img width="650" height="575" alt="Screenshot 2026-03-24 at 1 55 16 AM" src="https://github.com/user-attachments/assets/d52618d8-4bb4-4497-8b90-eca74890d4e1" />
 
 
 # About      
