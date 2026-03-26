@@ -1,7 +1,8 @@
-# Java prototype, render engine, for ESP32
-<img width="1077" height="422" alt="Screenshot 2026-03-20 at 1 11 23 AM" src="https://github.com/user-attachments/assets/16eb1bad-41b0-4fa8-814a-0fae08d8e16b" />
+# Prototype, render engine, for ESP32 in Java / Ver: 1.3.6 Alpha (2403.0131)
+<img width="650" height="575" alt="Screenshot 2026-03-24 at 1 55 16 AM" src="https://github.com/user-attachments/assets/d52618d8-4bb4-4497-8b90-eca74890d4e1" />
 
-# About
+
+# About      
 >This is a prototype software rendering and animation engine designed specifically for the ESP32. The main purpose of this engine is to allow users to create their own animations and >behaviors for lighting systems or display screens based on addressable LEDs.
 
 # A brief overview of how the engine works
