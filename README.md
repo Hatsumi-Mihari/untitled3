@@ -1,5 +1,5 @@
-# Prototype, render engine, for ESP32 in Java / Ver: 1.3.6 Alpha (2403.0131)
-<img width="650" height="575" alt="Screenshot 2026-03-24 at 1 55 16 AM" src="https://github.com/user-attachments/assets/d52618d8-4bb4-4497-8b90-eca74890d4e1" />
+# Prototype, render engine, for ESP32 in Java / 1.4.4 Alpha (2603.0226)
+<img width="1800" height="877" alt="Screenshot 2026-03-26 at 2 27 05 AM" src="https://github.com/user-attachments/assets/9ff8b9b7-a221-49fe-99a6-e280d4b01cac" />
 
 
 # About      
@@ -8,13 +8,16 @@
 # A brief overview of how the engine works
 >The core concept of this engine is to control the rendering process using bytecode that calls all graphics functions and the graphics module via callbacks. Currently, there are only 3 opcodes for triggering the rendering process and 2 opcodes service
 
-| ID_opcode | Name | type |
-| ------------- | ------------- | ------------- |
-| 0x00  | ReSizeFBO  | Render  |
-| 0x01  | FillColor | Render  |
-| 0x02  | Clear | Render  |
-| 0xFA  | JUMP_TO_SET_START | Service  |
-| 0xFB  | JMP | Service  |
+| ID_opcode | Name | type | payload size | signature payload |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+| 0x00  | ReSizeFBO  | Render  | 4 byte | 2 byte (size x), 2 byte (size y) |
+| 0x01  | FillColor | Render  | 4 byte | 4 byte (color RGBA) |
+| 0x02  | Clear | Render  | 0 byte | None |
+| 0x03  | CrateGradientRGBA | Render  | 16 byte | 4 byte (color 1 RGBA), 4 byte (color 2 RGBA), 2 byte (point x1), 2 byte (point y1), 2 byte (point x2), 2 byte (point y2) |
+| 0x04  | SetPixel | Render  | 8 byte | 4 byte (color 1 RGBA), 2 byte (point x), 2 byte (point y) |
+| 0xFA  | JUMP_TO_SET_START | Service | 0 byte | None |
+| 0xFB  | JMP | Service | 0 byte | None |
+
 
 # The structure of each opcode 
 | Opcode | Payload size | Payload |                  
