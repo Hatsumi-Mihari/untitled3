@@ -1,17 +1,22 @@
 package GL_Engine;
 
+import Logger.Logger;
+
 import javax.naming.SizeLimitExceededException;
 import java.util.ArrayList;
 
 public class GEngine_Main {
     protected int[] FBO;
-    private int size_x, size_y;
-    protected GEngine_Pixel_FN pixel_fn_obj = new GEngine_Pixel_FN();
+    protected int size_x, size_y;
+    protected GEngine_Pixel_FN pixel_fn_obj;
     private byte[] FBO_byte;
     protected int[] unzip_pixel = new int[4];
     private boolean FBO_byte_out = true;
+    protected Logger logger;
 
-    public GEngine_Main(int FBO_size) throws Exception {
+    public GEngine_Main(int FBO_size, Logger logger) throws Exception {
+        this.logger = logger;
+        this.pixel_fn_obj = new GEngine_Pixel_FN(this.logger);
         if(FBO_size <= 0){
             throw new Exception("FBO lower capacity 0");
         }

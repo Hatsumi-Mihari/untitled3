@@ -8,6 +8,10 @@ function toHex(num) {
             return id + " | FillColor";
         case "0x02":
             return id + " | Clear";
+        case "0x03":
+            return id + " | CrateGradientRGBA";
+        case "0x04":
+            return id + " | SetPixel";
         case "0xFA":
             return id + " | JUMP_TO_SET_START";
         case "0xFB":
@@ -38,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const opcode = document.getElementById("opcode");
     const cursor = document.getElementById("cursor");
     const tick_update = document.getElementById("tick_update");
+    const logger = document.getElementById("LOG");
 
     const btn_scale_fbo = document.getElementById("setScaleFBO");
     const btn_res_fbo = document.getElementById("setResFBO");
@@ -48,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reset_btn = document.getElementById("reset");
 
     const editor = document.getElementById("editor");
-    const hexE = new HexEditor("editor", new Uint8Array(), 8);
+    const hexE = new HexEditor("editor", new Uint8Array(), 20);
 
     btn_scale_fbo.onclick = () => {
         scaleValue = prompt("Input new value scale");
@@ -116,6 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
             opcode.textContent = toHex(json_debug.opcode & 0xFF);
             cursor.textContent = json_debug.cursor;
             tick_update.textContent = json_debug.tick_update;
+            logger.textContent = json_debug.log_cli;
+            console.log(json_debug.log_cli);
             hexE.setIP(json_debug.cursor);
 
 
@@ -135,12 +142,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         switch (bytes[0]) {
             case 0xFF:
-                console.log("Geted code VM");
+                //console.log("Geted code VM");
                 code = bytes.subarray(1);
                 hexE.update(code);
                 break;
             case 0xFE:
-                console.log("Geted FBO VM");
+                //console.log("Geted FBO VM");
                 const img = bytes.subarray(1);
                 for (let i = 0; i < img.length; i++) {
                     imageData.data[i] = img[i];

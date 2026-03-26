@@ -1,10 +1,12 @@
 package VM;
 
 import GL_Engine.GEngine_Functions;
+import Logger.Logger;
 
 import java.nio.ByteBuffer;
 
 public class VM_Main {
+    private Logger logger;
     private static final VM_OPcode vmOpcode = new VM_OPcode();
     private GEngine_Functions Gapi;
     private VM_Context context;
@@ -16,14 +18,15 @@ public class VM_Main {
     private int execOpcode = -1;
     private int execLenPayload = -1;
     private byte[] execPayload;
-    private boolean debugExecute = true;
 
 
-    public VM_Main(byte[] program, GEngine_Functions Gapi){
+    public VM_Main(byte[] program, GEngine_Functions Gapi, Logger logger){
         this.program = program;
         this.Gapi = Gapi;
         this.context = new VM_Context();
         this.vmOpcode.VM_context(Gapi);
+        this.vmOpcode.setLogger(logger);
+        this.logger = logger;
     }
 
     public void execute() throws InterruptedException {

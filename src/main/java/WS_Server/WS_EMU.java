@@ -1,6 +1,7 @@
 package WS_Server;
 
 import GL_Engine.GEngine_Functions;
+import Logger.Logger;
 import VM.VM_ByteT;
 
 import java.nio.ByteBuffer;
@@ -20,6 +21,7 @@ public class WS_EMU {
     private Consumer<Boolean> handlerResetVM;
     private Supplier<byte[]> handlerGetByteCodeVM;
     private static final List<Consumer<byte[]>> END_POINTS = new ArrayList<>(Collections.nCopies(32, null));
+    private Logger logger;
 
     private void setResolutionFBO(byte[] payload){
         if (payload.length != 4){
@@ -76,9 +78,10 @@ public class WS_EMU {
         this.handlerLoadByteCodeVM = handler;
     }
 
-    public WS_EMU(WS_Main socket, GEngine_Functions gl){
+    public WS_EMU(WS_Main socket, GEngine_Functions gl, Logger logger){
         this.socket = socket;
         this.gl = gl;
+        this.logger = logger;
         END_POINTS.set(0x00, this::setResolutionFBO);
         END_POINTS.set(0x01, this::setTickRate);
         END_POINTS.set(0x02, this::getByteCodeVM);
@@ -88,13 +91,20 @@ public class WS_EMU {
 
     public void sendDebugData(String ver, int[] screen_size, int scale, int opcode_exec, int cursor, int tick){
         if (!socket.isConnected()) return;
-        this.socket.sendString("{" +
-                "\"ver\":\"" + ver + "\"," +
-                "\"size\":[" + screen_size[0] + ", " + screen_size[1] + "]," +
-                "\"tick_update\":\"" + tick + " ms\"," +
-                "\"opcode\":" + opcode_exec + "," +
-                "\"cursor\":" + cursor +
-                "}");
+        String jsonTemplate = "{" +
+                "\"ver\":\"%s\"," +
+                "\"size\":[%d, %d]," +
+                "\"tick_update\":\"%d ms\"," +
+                "\"opcode\":%d," +
+                "\"cursor\":%d," +
+                "\"log_cli\":\"%s\"" +
+                "}";
+
+        String json = String.format(jsonTemplate,
+                ver, screen_size[0], screen_size[1], tick, opcode_exec, cursor,
+                logger.getLog().replace("\"", "\\\"").replace("\n", "\\n")
+        );
+        this.socket.sendString(json);
     }
 
     public void sendByteCode(byte[] code){
