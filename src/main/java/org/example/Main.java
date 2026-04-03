@@ -8,20 +8,18 @@ import WS_Server.WS_EMU;
 import WS_Server.WS_Main;
 import java.awt.Desktop;
 import java.io.File;
+import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         byte[] bytecode = {
                 (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x10, (byte) 0x00,(byte) 0x10,
-                (byte) 0xFA, (byte) 0x00, (byte) 0x00,
-                (byte) 0x03, (byte) 0x00, (byte) 0x10,
-                (byte) 0xFF, (byte) 0x00, (byte) 0x00, (byte) 0xFF,
-                (byte) 0x80, (byte) 0x00, (byte) 0x80,(byte) 0xFF,
-                (byte) 0x00,(byte) 0x01,
-                (byte) 0x00,(byte) 0x01,
-                (byte) 0x00,(byte) 0x10,
-                (byte) 0x00,(byte) 0x10,
-                (byte) 0xFB, (byte) 0x00, (byte) 0x00,
+                (byte) 0xF9, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
+                (byte) 0xF9, (byte) 0x00, (byte) 0x05, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04,
+                (byte) 0xF7, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,
+                (byte) 0x04, (byte) 0x00, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0x01, (byte) 0x00, (byte) 0x03,
+                (byte) 0xFB, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x17,
+
         };
         Logger logger = new Logger();
         GEngine_Main glContext = new GEngine_Main(1, logger);
@@ -49,6 +47,9 @@ public class Main {
             e.printStackTrace();
         }
 
+        Properties props = new Properties();
+        props.load(Main.class.getResourceAsStream("/version.properties"));
+
 
         while(true){
             while (vm.getCursorPos() < vm.getSizeByteCode()){
@@ -56,11 +57,14 @@ public class Main {
                 serverDebug.sendTypedBytePkg((byte)0xFE, glContext.render_ByteArr());
 
                 ws_emu.sendDebugData(
-                        "1.4.4 Alpha (2603.0226)",
+                        "Alpha 1.5.9-04040120 / build - " + props.getProperty("build.number"),
                         glContext.getSizeFBO(),
                         10, vm.getOpcodeNowExec(),
                         vm.getCursorOpcodePoss(),
-                        vm.getValueTick()
+                        vm.getValueTick(),
+                        vm.getDebugRegsVM(),
+                        vm.getDebugRegsU_VM(),
+                        vm.getDebugRegsFlags()
                 );
 
                 Thread.sleep(vm.getValueTick());

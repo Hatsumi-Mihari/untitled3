@@ -11,9 +11,13 @@ function toHex(num) {
         case "0x03":
             return id + " | CrateGradientRGBA";
         case "0x04":
-            return id + " | SetPixel";
-        case "0xFA":
-            return id + " | JUMP_TO_SET_START";
+            return id + " | DRAW";
+        case "0xF7":
+            return id + " | INC";
+        case "0xF8":
+            return id + " | CMP";
+        case "0xF9":
+            return id + " | LOAD";
         case "0xFB":
             return id + " | JMP";
     }
@@ -43,17 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const cursor = document.getElementById("cursor");
     const tick_update = document.getElementById("tick_update");
     const logger = document.getElementById("LOG");
+    const regs = document.getElementById("REGS");
+    const regs_u = document.getElementById("REGS_U");
+    const flags_vm = document.getElementById("FLAGS");
 
     const btn_scale_fbo = document.getElementById("setScaleFBO");
     const btn_res_fbo = document.getElementById("setResFBO");
     const setTickRate = document.getElementById("setTickRate");
     const updateByteCode = document.getElementById("updateByteCode");
-    const insert_btn = document.getElementById("insert");
-    const delete_btn = document.getElementById("delete");
+    //const insert_btn = document.getElementById("insert");
+    //const delete_btn = document.getElementById("delete");
     const reset_btn = document.getElementById("reset");
 
-    const editor = document.getElementById("editor");
-    const hexE = new HexEditor("editor", new Uint8Array(), 20);
+    const editor = new Editor();
+    const compiler_asm = new Compiler_ASM();
+    //const hexE = new HexEditor("editor", new Uint8Array(), 21);
 
     btn_scale_fbo.onclick = () => {
         scaleValue = prompt("Input new value scale");
@@ -76,21 +84,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     updateByteCode.onclick = () => {
-        code = hexE.getCode();
-        console.log(code);
-        socket.send(buildPKG(0x03, code.length, code));
+        code = editor.getCode();
+        console.log(editor.getCode());
+        const out = compiler_asm.compile_asm(editor.getCode());
+        socket.send(buildPKG(0x03, out.length, out));
     }
 
-    insert_btn.onclick = () => {
-        let index_insert = prompt("Select insert index (" + hexE.getIndexesInsert() + ")");
-        let size_payload = prompt("Input size payload by bytes: ");
-        hexE.insert_code(Number(index_insert) , 0x00, Number(size_payload));
-    }
+    //insert_btn.onclick = () => {
+       // let index_insert = prompt("Select insert index (" + hexE.getIndexesInsert() + ")");
+       // let size_payload = prompt("Input size payload by bytes: ");
+       // hexE.insert_code(Number(index_insert) , 0x00, Number(size_payload));
+    //}
 
-    delete_btn.onclick = () => {
-        let index_insert = prompt("Select delete index (" + hexE.getIndexesInsert() + ")");
-        hexE.delete_code(Number(index_insert));
-    }
+    //delete_btn.onclick = () => {
+       // let index_insert = prompt("Select delete index (" + hexE.getIndexesInsert() + ")");
+       // hexE.delete_code(Number(index_insert));
+    //}
 
     reset_btn.onclick = () => {
         socket.send(new Uint8Array([0x04, 0x00, 0x00]));
@@ -122,8 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
             cursor.textContent = json_debug.cursor;
             tick_update.textContent = json_debug.tick_update;
             logger.textContent = json_debug.log_cli;
+            regs.textContent = json_debug.regs_vm;
+            regs_u.textContent = json_debug.regs_u_vm;
+            flags_vm.textContent = json_debug.flags_vm;
             console.log(json_debug.log_cli);
-            hexE.setIP(json_debug.cursor);
+            //hexE.setIP(json_debug.cursor);
 
 
 

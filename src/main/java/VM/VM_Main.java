@@ -77,9 +77,20 @@ public class VM_Main {
 
     public void loadByteCode(byte[] code){
         this.program = code;
+        this.context.cursor = 0;
     }
 
     public int getSizeByteCode(){
         return this.program.length;
+    }
+
+    public int[] getDebugRegsVM() {
+        return this.context.register;
+    }
+    public int[] getDebugRegsU_VM() {
+        return this.context.register_u;
+    }
+    public boolean[] getDebugRegsFlags(){
+        return this.context.register_flags;
     }
 }

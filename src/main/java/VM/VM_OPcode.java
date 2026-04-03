@@ -37,16 +37,25 @@ public class VM_OPcode {
         );
     }
 
-    private void SetPixel(byte[] payload){
+    private void DRAW_PIXEL(byte[] payload){
         int color_r1 = payload[0] & 0xFF |
                 ((payload[1] & 0xFF) << 8) |
                 ((payload[2] & 0xFF) << 16 ) |
                 ((payload[3] & 0xFF) << 24 ) ;
 
-        int[] pos1 = {
-                this.byteEncode.BE16_encode(payload[4], payload[5]),
-                this.byteEncode.BE16_encode(payload[6], payload[7])
-        };
+        int[] pos1 = new int[2];
+
+        switch (payload[4]){
+            case 0x00:
+                pos1[0] = this.byteEncode.BE16_encode(payload[5], payload[6]);
+                pos1[1] = this.byteEncode.BE16_encode(payload[7], payload[8]);
+                break;
+            case 0x01:
+                pos1[0] = this.ctx.register_u[payload[5] & 0xFF];
+                pos1[1] = this.ctx.register_u[payload[6] & 0xFF];
+                break;
+        }
+
 
         this.Gapi.set_pixel_xy(color_r1, pos1);
 
@@ -100,20 +109,6 @@ public class VM_OPcode {
                 "INFO CrateGradientRGBA COLOR");
     }
 
-    private void JUMP_TO_SET_START(byte[] payload){
-        this.ctx.register[0x00] = this.ctx.cursor;
-        logger.Log(String.format("ADR: 0x%02X%02X",
-                        this.ctx.cursor & 0xFF, (this.ctx.cursor & 0xFF) << 8),
-                "INFO JUMP_TO_SET_START ADR");
-    }
-
-    private void JMP(byte[] payload){
-        this.ctx.cursor = this.ctx.register[0x00];
-        logger.Log(String.format("ADR: 0x%02X%02X",
-                        this.ctx.cursor & 0xFF, (this.ctx.cursor & 0xFF) << 8),
-                "INFO JMP TO");
-    }
-
     private void ReSizeFBO(byte[] payload){
         int x = this.byteEncode.BE16_encode(payload[0], payload[1]);
         int y = this.byteEncode.BE16_encode(payload[2], payload[3]);
@@ -122,14 +117,101 @@ public class VM_OPcode {
         logger.Log(String.format("FBO set size: %dx%d", x,y), "INFO ReSizeFBO");
     }
 
+
+
+
+
+
+    private void JMP(byte[] payload){
+        this.ctx.cursor = this.byteEncode.BE16_encode(payload[0], payload[1]);
+        this.ctx.register[0x00] =  this.byteEncode.BE16_encode(payload[0], payload[1]);
+        logger.Log(String.format("ADR: 0x%04X", this.ctx.cursor), "INFO, JMP TO");
+    }
+
+    private void LOAD(byte[] payload){
+        if (payload[0] < 0 || payload[0] >= this.ctx.register_u.length) {
+            this.logger.LOGE("Index out of range: index = " + payload[0]);
+            return;
+        }
+
+        this.ctx.register_u[payload[0]] = this.byteEncode.BE32_encode(new byte[]{payload[1], payload[2], payload[3], payload[4]});
+        logger.Log(String.format("REGISTER_U: %d, SET: %d",
+                        payload[0] & 0xFF, this.ctx.register_u[payload[0]]),
+                "INFO SET REG_U");
+    }
+
+    public void CMP(byte[] payload){
+        if (payload[0] < 0 || payload[0] >= this.ctx.register_u.length) {
+            this.logger.LOGE("Index arg 1, out of range: index = " + payload[0]);
+            return;
+        }
+
+        if (payload[2] < 0 || payload[2] >= this.ctx.register_u.length) {
+            this.logger.LOGE("Index arg 3, out of range: index = " + payload[2]);
+            return;
+        }
+
+        switch (payload[1]){
+            case 0x00:
+                if (this.ctx.register_u[payload[0]] == this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+            case 0x01:
+                if (this.ctx.register_u[payload[0]] < this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+            case 0x02:
+                if (this.ctx.register_u[payload[0]] > this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+            case 0x03:
+                if (this.ctx.register_u[payload[0]] <= this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+            case 0x04:
+                if (this.ctx.register_u[payload[0]] >= this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+            case 0x05:
+                if (this.ctx.register_u[payload[0]] != this.ctx.register_u[payload[2]]) this.ctx.register_flags[0] = true;
+                else this.ctx.register_flags[0] = false;
+                break;
+        }
+
+        int lable = this.byteEncode.BE16_encode(payload[3], payload[4]);
+        if (this.ctx.register_flags[0] != true) {
+            this.ctx.cursor = lable;
+        }
+
+        logger.Log(String.format("value 1 = %d, value 2 = %d, cmp_op = 0x%02X, flag = %b",
+                        this.ctx.register_u[payload[0]], this.ctx.register_u[payload[2]], payload[1], this.ctx.register_flags[0]),
+                "INFO CMP");
+    }
+
+    public void INC(byte[] payload){
+        if (payload[0] < 0 || payload[0] >= this.ctx.register.length) {
+            this.logger.LOGE("Index out of range: index = " + payload[0]);
+            return;
+        }
+
+        int value_inc = this.byteEncode.BE32_encode( new byte[]{payload[1], payload[2], payload[3], payload[4]});
+        this.ctx.register_u[payload[0]] += value_inc;
+
+        logger.Log(String.format("REGISTER_U: %d, SET: %d",
+                        this.ctx.register_u[1] & 0xFF, this.ctx.register_u[payload[0]]),
+                "INFO INC");
+    }
+
     public VM_OPcode(){
         COMMANDS.set(0x00, this::ReSizeFBO);
         COMMANDS.set(0x01, this::FillColor);
         COMMANDS.set(0x02, this::Clear);
         COMMANDS.set(0x03, this::CrateGradientRGBA);
-        COMMANDS.set(0x04, this::SetPixel);
+        COMMANDS.set(0x04, this::DRAW_PIXEL);
 
-        COMMANDS.set(0xFA, this::JUMP_TO_SET_START);
+        COMMANDS.set(0xF7, this::INC);
+        COMMANDS.set(0xF8, this::CMP);
+        COMMANDS.set(0xF9, this::LOAD);
         COMMANDS.set(0xFB, this::JMP);
     }
 

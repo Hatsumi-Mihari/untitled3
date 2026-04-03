@@ -15,8 +15,7 @@ class HexEditor {
 
     render() {
         this.container.style.display = 'grid';
-        this.container.style.gridTemplateColumns = `repeat(${this.bytesPerLine}, 40px)`;
-        //this.container.style.gap = '2px';
+        this.container.style.gridTemplateColumns = `60px 60px repeat(${this.bytesPerLine - 2}, 40px)`;
         let counter_wrap = 0;
         let hightlightSizePayload = 0;
 
@@ -28,18 +27,26 @@ class HexEditor {
 
             const idInset = document.createElement('div');
             idInset.className = 'hex-id';
+            const idInset_hex = document.createElement('div');
+            idInset_hex.classList = ['hex-id hex-id-addr-jmp'];
 
             if (i == this.indexWrap[counter_wrap]) {
-                idInset.style.gridColumn = 1;
+                idInset.style.gridColumn = 2;
                 idInset.textContent = this.indexWrap[counter_wrap];
                 idInset.dataset.offset = -1;
 
-                cell.style.gridColumn = 2;
+                idInset_hex.style.gridColumn = 1;
+                idInset_hex.textContent = this.formatHex16(this.indexWrap[counter_wrap]);
+                idInset_hex.dataset.offset = -1;
+
+                cell.style.gridColumn = 3;
                 cell.classList.add('hex-cell-OPCODE');
                 counter_wrap++;
                 hightlightSizePayload = 2;
 
+                this.container.appendChild(idInset_hex);
                 this.container.appendChild(idInset);
+                
 
             }else if (hightlightSizePayload > 0){
                 cell.classList.add('hex-cell-OPCODE-SIZE');
@@ -96,6 +103,10 @@ class HexEditor {
 
     formatHex(val) {
         return val.toString(16).padStart(2, '0').toUpperCase();
+    }
+
+    formatHex16(val) {
+        return val.toString(16).padStart(4, '0').toUpperCase();
     }
 
     handleInput(offset, value) {

@@ -71,7 +71,7 @@ public class WS_EMU {
 
     private void LoadByteCode(byte[] payload){
         this.handlerLoadByteCodeVM.accept(payload);
-        System.out.println("Load new code VM");
+        logger.LOGI("Load new code VM");
         this.getByteCodeVM(new byte[0]);
     }
     public void setHandlerLoadByteCode(Consumer<byte[]> handler){
@@ -89,20 +89,39 @@ public class WS_EMU {
         END_POINTS.set(0x04, this::resetVM);
     }
 
-    public void sendDebugData(String ver, int[] screen_size, int scale, int opcode_exec, int cursor, int tick){
+    public void sendDebugData(String ver, int[] screen_size, int scale, int opcode_exec, int cursor, int tick, int[] regs_vm, int[] regs_vm_u, boolean[] flags){
         if (!socket.isConnected()) return;
+        String regs = "";
+        String regs_u = "";
+        String flags_s = "";
+
+        for (int i = 0; i < regs_vm.length; i++){
+            regs += regs_vm[i] + " | ";
+        }
+
+        for (int i = 0; i < regs_vm_u.length; i++){
+            regs_u += regs_vm_u[i] + " | ";
+        }
+
+        for (int i = 0; i < flags.length; i++){
+            flags_s += flags[i] + " | ";
+        }
         String jsonTemplate = "{" +
                 "\"ver\":\"%s\"," +
                 "\"size\":[%d, %d]," +
                 "\"tick_update\":\"%d ms\"," +
                 "\"opcode\":%d," +
                 "\"cursor\":%d," +
-                "\"log_cli\":\"%s\"" +
+                "\"log_cli\":\"%s\"," +
+                "\"flags_vm\":\"%s\"," +
+                "\"regs_vm\":\"%s\"," +
+                "\"regs_u_vm\":\"%s\"" +
                 "}";
 
         String json = String.format(jsonTemplate,
                 ver, screen_size[0], screen_size[1], tick, opcode_exec, cursor,
-                logger.getLog().replace("\"", "\\\"").replace("\n", "\\n")
+                logger.getLog().replace("\"", "\\\"").replace("\n", "\\n"),
+                flags_s, regs, regs_u
         );
         this.socket.sendString(json);
     }

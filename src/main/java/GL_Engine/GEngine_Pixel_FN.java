@@ -100,10 +100,10 @@ public class GEngine_Pixel_FN {
     }
 
     public int get_index_xy(int[] point, int size_fbo_x, int size_fbo_y) {
-        int x = point[0] - 1;
-        int y = point[1] - 1;
-        if (x < 0 || y < 0) return 0;
+        int x = point[0] ;
+        int y = point[1] ;
 
+        if (x < 0 || y < 0) return 0;
         if (x >= size_fbo_x || y >= size_fbo_y) return 0;
 
         return y * size_fbo_x + x;

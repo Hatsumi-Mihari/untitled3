@@ -46,6 +46,12 @@
     padding-top: 2px;
 }
 
+.hex-id-addr-jmp{
+    display: grid;
+    background-color: #343434;
+    color: #d3d3d3;
+}
+
 .hex-cell-OPCODE{
     background-color: #015D0A;
     border: #015D0A 2px solid;

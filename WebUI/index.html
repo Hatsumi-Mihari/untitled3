@@ -37,6 +37,12 @@
                     <p id="cursor" class="data_st"></p>
                     <p class="title">LOG:</p>
                     <p id="LOG" class="data_st"></p>
+                    <p class="title">FLAGS:</p>
+                    <p id="FLAGS" class="data_st"></p>
+                    <p class="title">REGISRES:</p>
+                    <p id="REGS" class="data_st"></p>
+                    <p class="title">REGISRES_USER:</p>
+                    <p id="REGS_U" class="data_st"></p>
                 </div>
             </div>
             <div></div>
@@ -50,19 +56,30 @@
             <div></div>
             <div>
                 <h3>Byte Code VM run-time</h3>
-                <div class="editor_div">
-                    <hex-editor id="editor"></hex-editor>
-                    <div class="btns">
-                        <button id="insert">insert</button>
-                        <button id="delete">delete</button>
+                <div>
+                    <div id="container" style="width:800px;height:600px;"></div>
+                    <!--
+                    div class="editor_div">
+                        <hex-editor id="editor"></hex-editor>
+                        <div class="btns">
+                            <button id="insert">insert</button>
+                            <button id="delete">delete</button>
+                        </div>
                     </div>
+                    -->
                 </div>
             </div>
-            <div class="code-color">
+            <!--<div class="code-color">
+                <div class="row">
+                    <div class="color-c" style="background-color: #343434;"></div>
+                    <div class="data-c">
+                        Incert or Jump Byte Index Hex
+                    </div>
+                </div>
                 <div class="row">
                     <div class="color-c" style="background-color: #5B4600;"></div>
                     <div class="data-c">
-                        Incert Byte Index
+                        Incert Byte Index Dex
                     </div>
                 </div>
                 <div class="row">
@@ -77,10 +94,13 @@
                         Payload Size
                     </div>
                 </div>
-            </div>
+            </div>-->
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>
     <script src="hex_editor.js"></script>
+    <script src="compiler.js"></script>
+    <script src="editor.js"></script>
     <script src="index.js"></script>
 </body>
 

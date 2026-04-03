@@ -44,8 +44,6 @@ public class GEngine_Functions{
                 this.engine.pixel_fn_obj.get_index_xy(pos2, this.engine.size_x, this.engine.size_y)
         };
 
-        this.engine.logger.LOGI(index_ips[0] + " " + index_ips[1]);
-
         int count_pixel = engine.pixel_fn_obj.get_count_pixels(index_ips[0], index_ips[1]);
         int t = 0;
 

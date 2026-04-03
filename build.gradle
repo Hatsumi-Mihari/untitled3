@@ -41,3 +41,16 @@ test {
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
+
+task incrementBuildNumber {
+    doLast {
+        def propsFile = file('src/main/resources/version.properties')
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        def nextBuild = (props['build.number'] as Integer) + 1
+        props['build.number'] = nextBuild.toString()
+        props.store(propsFile.newWriter(), null)
+    }
+}
+
+classes.dependsOn incrementBuildNumber
