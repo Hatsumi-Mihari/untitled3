@@ -11,6 +11,7 @@ public class GEngine_Main {
     protected GEngine_Pixel_FN pixel_fn_obj;
     private byte[] FBO_byte;
     protected int[] unzip_pixel = new int[4];
+    private int[] window_dr = new int[4];
     private boolean FBO_byte_out = true;
     protected Logger logger;
 
@@ -41,6 +42,33 @@ public class GEngine_Main {
 
         this.FBO = new int[size_x * size_y];
         if (FBO_byte_out) this.FBO_byte = new byte[(size_x * size_y) * 4];
+    }
+
+    public void set_window_draw(int x0, int y0, int x1, int y1){
+        if (x0 > this.size_x | x0 < 0) {
+            logger.LOGE("x0 > this.size_x l:49 G_main");
+            return;
+        }
+
+        if (y0 > this.size_y | y0 < 0) {
+            logger.LOGE("y0 > this.size_x l:54 G_main");
+            return;
+        }
+
+        if (x1 > this.size_x | x1 < 0) {
+            logger.LOGE("x1 > this.size_x l:59 G_main");
+            return;
+        }
+
+        if (y1 > this.size_y | y1 < 0) {
+            logger.LOGE("y1 > this.size_x l:64 G_main");
+            return;
+        }
+
+        this.window_dr[0] = x0;
+        this.window_dr[1] = y0;
+        this.window_dr[2] = x1;
+        this.window_dr[3] = y1;
     }
 
     public void render_CLI(){

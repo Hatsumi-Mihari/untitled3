@@ -178,6 +178,44 @@ class Compiler_ASM {
                 build: function (ctx, args) {
                     buildStartCommand(ctx.outCode, this.opcode, this.payloadSize, ctx.pointer);
                 }
+            },
+
+            'FILL_C': {
+                opcode: 0x01,
+                payloadSize: encodeInt16BE(4),
+                totalSizeLineOpcodeBytes: 7,
+                build: function (ctx, args) {
+                    buildStartCommand(ctx.outCode, this.opcode, this.payloadSize, ctx.pointer);
+                    buildPayload(ctx.outCode, 3, encodeInt32BE(encodeColorRGBA8888(args[0])), ctx.pointer);
+                }
+            },
+            'CGL_RGB': {
+                opcode: 0x03,
+                payloadSize: encodeInt16BE(18),
+                totalSizeLineOpcodeBytes: 21,
+                build: function (ctx, args) {
+                    buildStartCommand(ctx.outCode, this.opcode, this.payloadSize, ctx.pointer);
+                    buildPayload(ctx.outCode, 3, encodeInt32BE(encodeColorRGBA8888(args[0])), ctx.pointer);
+                    buildPayload(ctx.outCode, 7, encodeInt32BE(encodeColorRGBA8888(args[1])), ctx.pointer);
+                    buildPayload(ctx.outCode, 11, encodeInt16BE(parseInt(args[2])), ctx.pointer);
+                    buildPayload(ctx.outCode, 13, encodeInt16BE(parseInt(args[3])), ctx.pointer);
+                    buildPayload(ctx.outCode, 15, encodeInt16BE(parseInt(args[4])), ctx.pointer);
+                    buildPayload(ctx.outCode, 17, encodeInt16BE(parseInt(args[5])), ctx.pointer);
+                    buildPayload(ctx.outCode, 19, encodeInt16BE(parseInt(args[6])), ctx.pointer);
+                }
+            }, 
+            'SQR_DRW': {
+                opcode: 0x05,
+                payloadSize: encodeInt16BE(12),
+                totalSizeLineOpcodeBytes: 15,
+                build: function (ctx, args) {
+                    buildStartCommand(ctx.outCode, this.opcode, this.payloadSize, ctx.pointer);
+                    buildPayload(ctx.outCode, 3, encodeInt32BE(encodeColorRGBA8888(args[0])), ctx.pointer);
+                    buildPayload(ctx.outCode, 7, encodeInt16BE(parseInt(args[1])), ctx.pointer);
+                    buildPayload(ctx.outCode, 9, encodeInt16BE(parseInt(args[2])), ctx.pointer);
+                    buildPayload(ctx.outCode, 11, encodeInt16BE(parseInt(args[3])), ctx.pointer);
+                    buildPayload(ctx.outCode, 13, encodeInt16BE(parseInt(args[4])), ctx.pointer);
+                }
             }
         };
 

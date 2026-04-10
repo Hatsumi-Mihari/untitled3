@@ -26,7 +26,7 @@ public class Main {
         GEngine_Functions gl = new GEngine_Functions(glContext);
 
 
-        WS_Main serverDebug = new WS_Main(1204);
+        WS_Main serverDebug = new WS_Main(1205);
         WS_EMU ws_emu = new WS_EMU(serverDebug, gl, logger);
         serverDebug.setHandlerProcess(ws_emu::checkEndPoint);
         serverDebug.start();
@@ -41,7 +41,7 @@ public class Main {
         try {
             String currentDir = System.getProperty("user.dir");
             File html = new File(currentDir + File.separator + "WebUI" + File.separator + "index.html");
-            Desktop.getDesktop().browse(html.toURI());
+            //Desktop.getDesktop().browse(html.toURI());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +57,7 @@ public class Main {
                 serverDebug.sendTypedBytePkg((byte)0xFE, glContext.render_ByteArr());
 
                 ws_emu.sendDebugData(
-                        "Alpha 1.5.9-04040120 / build - " + props.getProperty("build.number"),
+                        props.getProperty("build.version") + " / build - " + props.getProperty("build.number"),
                         glContext.getSizeFBO(),
                         10, vm.getOpcodeNowExec(),
                         vm.getCursorOpcodePoss(),

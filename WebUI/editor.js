@@ -12,7 +12,7 @@ class Editor {
             monaco.languages.setMonarchTokensProvider('myAsm', {
                 tokenizer: {
                     root: [
-                        [/\b(LOAD|LOAD_CZ|ADD|INC|JMP|CMP|RS_FBO|DRW_PU|DRW_PR|CL)\b/, 'keyword'],
+                        [/\b(LOAD|LOAD_CZ|ADD|INC|JMP|CMP|RS_FBO|DRW_PU|DRW_PR|CL|FILL_C|CGL_RGB|SQR_DRW)\b/, 'keyword'],
                         [/\bR[0-9]+\b/, 'variable'],
                         [/[0-9]+/, 'number'],
                         [/;.*$/, 'comment'],
@@ -24,10 +24,7 @@ class Editor {
 
             self.editor = monaco.editor.create(document.getElementById('container'), {
                 value: [
-                    'LOAD R1 5',
-                    '@lable MainLoop',
-                    'JMP MainLoop',
-                    'CMP R0 <= R1 MainLoop'
+
                 ].join('\n'),
                 language: 'myAsm',
                 theme: 'vs-dark',
@@ -49,3 +46,4 @@ class Editor {
 
 
 }
+

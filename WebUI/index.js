@@ -32,8 +32,9 @@ function buildPKG(type, size, data) {
     return pkg;
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
-    const socket = new WebSocket("ws://127.0.0.1:1204");
+    let socket = new WebSocket("ws://127.0.0.1:1205");
 
     let scaleValue = 16;
     const canvas = document.getElementById("screen");
@@ -50,18 +51,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const regs = document.getElementById("REGS");
     const regs_u = document.getElementById("REGS_U");
     const flags_vm = document.getElementById("FLAGS");
+    const server_status = document.getElementById("server_status");
 
     const btn_scale_fbo = document.getElementById("setScaleFBO");
     const btn_res_fbo = document.getElementById("setResFBO");
     const setTickRate = document.getElementById("setTickRate");
     const updateByteCode = document.getElementById("updateByteCode");
-    //const insert_btn = document.getElementById("insert");
-    //const delete_btn = document.getElementById("delete");
     const reset_btn = document.getElementById("reset");
+    const refreshServer = document.getElementById("refreshServer");
 
     const editor = new Editor();
     const compiler_asm = new Compiler_ASM();
-    //const hexE = new HexEditor("editor", new Uint8Array(), 21);
 
     btn_scale_fbo.onclick = () => {
         scaleValue = prompt("Input new value scale");
@@ -90,17 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.send(buildPKG(0x03, out.length, out));
     }
 
-    //insert_btn.onclick = () => {
-       // let index_insert = prompt("Select insert index (" + hexE.getIndexesInsert() + ")");
-       // let size_payload = prompt("Input size payload by bytes: ");
-       // hexE.insert_code(Number(index_insert) , 0x00, Number(size_payload));
-    //}
-
-    //delete_btn.onclick = () => {
-       // let index_insert = prompt("Select delete index (" + hexE.getIndexesInsert() + ")");
-       // hexE.delete_code(Number(index_insert));
-    //}
-
     reset_btn.onclick = () => {
         socket.send(new Uint8Array([0x04, 0x00, 0x00]));
     }
@@ -115,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
         socket.send(new Uint8Array([0x02, 0x00, 0x00]));
     };
 
-    socket.onmessage = (event) => {
+    function fnContect(event) {
         const buffer = event.data;
         const bytes = new Uint8Array(buffer);
 
@@ -134,8 +123,8 @@ document.addEventListener("DOMContentLoaded", () => {
             regs.textContent = json_debug.regs_vm;
             regs_u.textContent = json_debug.regs_u_vm;
             flags_vm.textContent = json_debug.flags_vm;
+            server_status.textContent = socket.readyState;
             console.log(json_debug.log_cli);
-            //hexE.setIP(json_debug.cursor);
 
 
 
@@ -154,12 +143,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         switch (bytes[0]) {
             case 0xFF:
-                //console.log("Geted code VM");
                 code = bytes.subarray(1);
-                hexE.update(code);
                 break;
             case 0xFE:
-                //console.log("Geted FBO VM");
                 const img = bytes.subarray(1);
                 for (let i = 0; i < img.length; i++) {
                     imageData.data[i] = img[i];
@@ -169,4 +155,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
     };
+
+    refreshServer.onclick = () => {
+        console.log(123);
+        socket = new WebSocket("ws://127.0.0.1:1205");
+        socket.binaryType = "arraybuffer";
+        socket.onopen = () => {
+            console.log("Connected");
+            socket.send(new Uint8Array([0x02, 0x00, 0x00]));
+        };
+        socket.onmessage = fnContect;
+    };
+
+    socket.onmessage = (event) => {fnContect(event);}
 });

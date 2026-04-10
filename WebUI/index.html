@@ -29,6 +29,8 @@
                     <p class="title">FBO_scale:</p>
                     <p id="fbo_scale" class="data_st">10x</p>
 
+                    <p class="title">Server Status:</p>
+                    <p id="server_status" class="data_st"></p>
                     <p class="title">tick_update:</p>
                     <p id="tick_update" class="data_st"></p>
                     <p class="title">Opcode:</p>
@@ -48,6 +50,7 @@
             <div></div>
             <div class="debug_inp">
                 <button id="setScaleFBO">Set Scale FBO</button>
+                <button id="refreshServer">Refresh Server</button>
                 <button id="setResFBO">Set resulution FBO</button>
                 <button id="setTickRate">Set tickrate update</button>
                 <button id="updateByteCode">Force update byte-code</button>
@@ -55,46 +58,11 @@
             </div>
             <div></div>
             <div>
-                <h3>Byte Code VM run-time</h3>
+                <h3>Assembly code VM</h3>
                 <div>
                     <div id="container" style="width:800px;height:600px;"></div>
-                    <!--
-                    div class="editor_div">
-                        <hex-editor id="editor"></hex-editor>
-                        <div class="btns">
-                            <button id="insert">insert</button>
-                            <button id="delete">delete</button>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
-            <!--<div class="code-color">
-                <div class="row">
-                    <div class="color-c" style="background-color: #343434;"></div>
-                    <div class="data-c">
-                        Incert or Jump Byte Index Hex
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="color-c" style="background-color: #5B4600;"></div>
-                    <div class="data-c">
-                        Incert Byte Index Dex
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="color-c" style="background-color: #015D0A;"></div>
-                    <div class="data-c">
-                        Opcode ID
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="color-c" style="background-color: #000D5C;"></div>
-                    <div class="data-c">
-                        Payload Size
-                    </div>
-                </div>
-            </div>-->
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.min.js"></script>

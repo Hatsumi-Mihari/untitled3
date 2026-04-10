@@ -90,13 +90,14 @@ public class VM_OPcode {
                 this.byteEncode.BE16_encode(payload[14], payload[15])
         };
 
-        this.Gapi.create_gradient_rgba(color_r1, color_r2, pos1, pos2);
+        int angle = this.byteEncode.BE16_encode(payload[16], payload[17]);
 
-        logger.Log(String.format("Point1: x =  %d, y = %d | Point2: x = %d, y = %d",
+        this.Gapi.create_gradient_rgba(color_r1, color_r2, pos1, pos2, angle);
+
+        logger.Log(String.format("Point1: x =  %d, y = %d | Point2: x = %d, y = %d | Angle = %d | Colors: = 0x%02X%02X%02X_%02X | 0x%02X%02X%02X_%02X",
                         pos1[0], pos1[1],
-                        pos2[0], pos2[1]),
-                "INFO CrateGradientRGBA POS");
-        logger.Log(String.format("Colors: = 0x%02X%02X%02X_%02X | 0x%02X%02X%02X_%02X",
+                        pos2[0], pos2[1],
+                        angle,
                         payload[0] & 0xFF,
                         payload[1] & 0xFF,
                         payload[2] & 0xFF,
@@ -106,7 +107,7 @@ public class VM_OPcode {
                         payload[5] & 0xFF,
                         payload[6] & 0xFF,
                         payload[7] & 0xFF),
-                "INFO CrateGradientRGBA COLOR");
+                "INFO CrateGradientRGBA");
     }
 
     private void ReSizeFBO(byte[] payload){
@@ -117,9 +118,41 @@ public class VM_OPcode {
         logger.Log(String.format("FBO set size: %dx%d", x,y), "INFO ReSizeFBO");
     }
 
+    private void SET_WINDOW_DRW(byte[] payload){
+        int x0 = this.byteEncode.BE16_encode(payload[0], payload[1]);
+        int y0 = this.byteEncode.BE16_encode(payload[2], payload[3]);
 
+        int x1 = this.byteEncode.BE16_encode(payload[4], payload[5]);
+        int y1 = this.byteEncode.BE16_encode(payload[6], payload[7]);
+        logger.Log(String.format("FBO set size: %dx%d", x1,y1), "INFO ReSizeFBO");
+        this.Gapi.SET_WINDOW(x0, y0, x1, y1);
+    }
 
+    private void SQR_DRW(byte[] payload){
+        int color_r1 = payload[0] & 0xFF |
+                ((payload[1] & 0xFF) << 8) |
+                ((payload[2] & 0xFF) << 16 ) |
+                ((payload[3] & 0xFF) << 24 ) ;
 
+        int[] pos1 = {
+                this.byteEncode.BE16_encode(payload[4], payload[5]),
+                this.byteEncode.BE16_encode(payload[6], payload[7])
+        };
+
+        int[] pos2 = {
+                this.byteEncode.BE16_encode(payload[8], payload[9]),
+                this.byteEncode.BE16_encode(payload[10], payload[11])
+        };
+        logger.Log(String.format("Point1: x =  %d, y = %d | Point2: x = %d, y = %d | Colors: = 0x%02X%02X%02X_%02X ",
+                        pos1[0], pos1[1],
+                        pos2[0], pos2[1],
+                        payload[0] & 0xFF,
+                        payload[1] & 0xFF,
+                        payload[2] & 0xFF,
+                        payload[3] & 0xFF),
+                "INFO SQR_DRW POS & COLOR");
+        this.Gapi.sqr_drw(color_r1, pos1, pos2);
+    }
 
 
     private void JMP(byte[] payload){
@@ -208,6 +241,7 @@ public class VM_OPcode {
         COMMANDS.set(0x02, this::Clear);
         COMMANDS.set(0x03, this::CrateGradientRGBA);
         COMMANDS.set(0x04, this::DRAW_PIXEL);
+        COMMANDS.set(0x05, this::SQR_DRW);
 
         COMMANDS.set(0xF7, this::INC);
         COMMANDS.set(0xF8, this::CMP);
