@@ -6,21 +6,13 @@ import Logger.Logger;
 import VM.VM_Main;
 import WS_Server.WS_EMU;
 import WS_Server.WS_Main;
-import java.awt.Desktop;
+
 import java.io.File;
 import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        byte[] bytecode = {
-                (byte) 0x00, (byte) 0x00, (byte) 0x04, (byte) 0x00, (byte) 0x10, (byte) 0x00,(byte) 0x10,
-                (byte) 0xF9, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00,
-                (byte) 0xF9, (byte) 0x00, (byte) 0x05, (byte) 0x01, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x04,
-                (byte) 0xF7, (byte) 0x00, (byte) 0x05, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x01,
-                (byte) 0x04, (byte) 0x00, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0xFF, (byte) 0xFF, (byte) 0x01, (byte) 0x00, (byte) 0x03,
-                (byte) 0xFB, (byte) 0x00, (byte) 0x02, (byte) 0x00, (byte) 0x17,
-
-        };
+        byte[] bytecode = {};
         Logger logger = new Logger();
         GEngine_Main glContext = new GEngine_Main(1, logger);
         GEngine_Functions gl = new GEngine_Functions(glContext);
@@ -31,7 +23,7 @@ public class Main {
         serverDebug.setHandlerProcess(ws_emu::checkEndPoint);
         serverDebug.start();
 
-        VM_Main vm = new VM_Main(bytecode, gl, logger);
+        VM_Main vm = new VM_Main(bytecode, gl, logger, serverDebug::sendTypedBytePkg);
         vm.setTick(1000);
         ws_emu.setHandlerSetTickRate(vm::setTick);
         ws_emu.setHandlerGetByteCodeVM(vm::getByteCodeVM_Debug);
@@ -50,28 +42,36 @@ public class Main {
         Properties props = new Properties();
         props.load(Main.class.getResourceAsStream("/version.properties"));
 
+        long lastDebug = 0;
+
+        final long debugInterval = 200;
 
         while(true){
-            while (vm.getCursorPos() < vm.getSizeByteCode()){
-                vm.execute();
+            long now = System.currentTimeMillis();
+            try {
+                vm.update();
+
+                long frameTime = System.currentTimeMillis() - now;
+                Thread.sleep(Math.max(0, vm.getValueTick() - frameTime));
+
+
+                if (now - lastDebug >= debugInterval) {
+                    ws_emu.sendDebugData(
+                            props.getProperty("build.version") + " / build - " + props.getProperty("build.number"),
+                            glContext.getSizeFBO(),
+                            10, vm.getOpcodeNowExec(),
+                            vm.getCursorOpcodePoss(),
+                            vm.getValueTick(),
+                            vm.getDebugRegsVM(),
+                            vm.getDebugRegsU_VM(),
+                            vm.getDebugRegsFlags(),
+                            vm.getDebugRegsColor()
+                    );
+                    lastDebug = now;
+                }
+
                 serverDebug.sendTypedBytePkg((byte)0xFE, glContext.render_ByteArr());
 
-                ws_emu.sendDebugData(
-                        props.getProperty("build.version") + " / build - " + props.getProperty("build.number"),
-                        glContext.getSizeFBO(),
-                        10, vm.getOpcodeNowExec(),
-                        vm.getCursorOpcodePoss(),
-                        vm.getValueTick(),
-                        vm.getDebugRegsVM(),
-                        vm.getDebugRegsU_VM(),
-                        vm.getDebugRegsFlags()
-                );
-
-                Thread.sleep(vm.getValueTick());
-            }
-
-            try {
-                Thread.sleep(150);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

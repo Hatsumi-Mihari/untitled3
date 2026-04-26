@@ -15,7 +15,7 @@ public class GEngine_Pixel_FN {
         if (tb < 0) tb = 0;
         if (ta < 0) ta = 0;
 
-        return tr & 0xFF | tg << 8 | tb << 16 | ta << 24;
+        return tr & 0xFF | (tg & 0xFF) << 8 | (tb & 0xFF)<< 16 | (ta & 0xFF) << 24;
     }
 
     public void get_unzip_pixel(int pixel, int[] pixel_unzip){
@@ -32,7 +32,7 @@ public class GEngine_Pixel_FN {
     }
 
     public int RGB_to_HLS(int color){
-        int[] rgb = new int[3];
+        int[] rgb = new int[4];
         this.get_unzip_pixel(color, rgb);
 
         int r = rgb[0], g = rgb[1], b = rgb[2];
@@ -63,7 +63,7 @@ public class GEngine_Pixel_FN {
             if (hue > 255) hue -= 255;
         }
 
-        return set_pixel(hue, light, sat, 0);
+        return set_pixel(hue, light, sat, rgb[3]);
 
     }
 

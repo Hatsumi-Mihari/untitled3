@@ -34,7 +34,7 @@ function buildPKG(type, size, data) {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    let socket = new WebSocket("ws://127.0.0.1:1205");
+    let socket = new WebSocket("ws://0.0.0.0:1205");
 
     let scaleValue = 16;
     const canvas = document.getElementById("screen");
@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const regs = document.getElementById("REGS");
     const regs_u = document.getElementById("REGS_U");
     const flags_vm = document.getElementById("FLAGS");
+    const regs_color = document.getElementById("REGS_CCH");
     const server_status = document.getElementById("server_status");
 
     const btn_scale_fbo = document.getElementById("setScaleFBO");
@@ -123,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
             regs.textContent = json_debug.regs_vm;
             regs_u.textContent = json_debug.regs_u_vm;
             flags_vm.textContent = json_debug.flags_vm;
+            regs_color.textContent = json_debug.regs_color;
             server_status.textContent = socket.readyState;
             console.log(json_debug.log_cli);
 

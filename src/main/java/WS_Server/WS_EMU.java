@@ -89,11 +89,12 @@ public class WS_EMU {
         END_POINTS.set(0x04, this::resetVM);
     }
 
-    public void sendDebugData(String ver, int[] screen_size, int scale, int opcode_exec, int cursor, int tick, int[] regs_vm, int[] regs_vm_u, boolean[] flags){
+    public void sendDebugData(String ver, int[] screen_size, int scale, int opcode_exec, int cursor, int tick, int[] regs_vm, int[] regs_vm_u, boolean[] flags, int[] regs_color){
         if (!socket.isConnected()) return;
         String regs = "";
         String regs_u = "";
         String flags_s = "";
+        String color_r = "";
 
         for (int i = 0; i < regs_vm.length; i++){
             regs += regs_vm[i] + " | ";
@@ -106,6 +107,10 @@ public class WS_EMU {
         for (int i = 0; i < flags.length; i++){
             flags_s += flags[i] + " | ";
         }
+
+        for (int i = 0; i < regs_color.length; i++){
+            color_r += regs_color[i] + " | ";
+        }
         String jsonTemplate = "{" +
                 "\"ver\":\"%s\"," +
                 "\"size\":[%d, %d]," +
@@ -115,13 +120,14 @@ public class WS_EMU {
                 "\"log_cli\":\"%s\"," +
                 "\"flags_vm\":\"%s\"," +
                 "\"regs_vm\":\"%s\"," +
-                "\"regs_u_vm\":\"%s\"" +
+                "\"regs_u_vm\":\"%s\"," +
+                "\"regs_color\":\"%s\"" +
                 "}";
 
         String json = String.format(jsonTemplate,
                 ver, screen_size[0], screen_size[1], tick, opcode_exec, cursor,
                 logger.getLog().replace("\"", "\\\"").replace("\n", "\\n"),
-                flags_s, regs, regs_u
+                flags_s, regs, regs_u,color_r
         );
         this.socket.sendString(json);
     }

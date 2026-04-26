@@ -6,6 +6,10 @@ public class Logger {
     private LocalDateTime now;
     private String log = "";
 
+    private boolean log_render_calls = false;
+    private boolean log_vm_bs_opcodes = false;
+    private boolean log_events = true;
+
     private void handlerLog(String msg){
         System.out.print(msg + "\n");
         this.log = msg + "\n";
@@ -37,5 +41,17 @@ public class Logger {
 
     public String getLog(){
         return this.log;
+    }
+
+    public boolean state_log_render_calls(){
+        return this.log_render_calls;
+    }
+
+    public boolean state_log_evets(){
+        return this.log_events;
+    }
+
+    public boolean state_log_vm_bs_opcode(){
+        return this.log_vm_bs_opcodes;
     }
 }

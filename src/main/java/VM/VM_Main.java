@@ -4,6 +4,7 @@ import GL_Engine.GEngine_Functions;
 import Logger.Logger;
 
 import java.nio.ByteBuffer;
+import java.util.function.BiConsumer;
 
 public class VM_Main {
     private Logger logger;
@@ -12,31 +13,31 @@ public class VM_Main {
     private VM_Context context;
     private byte[] program;
     private int tick = 16;
+    private int watchdog = 1500;
 
-    private final int sizeHeaderBytes = 3;
+    private final int sizeHeaderBytes = 2;
 
     private int execOpcode = -1;
     private int execLenPayload = -1;
     private byte[] execPayload;
 
 
-    public VM_Main(byte[] program, GEngine_Functions Gapi, Logger logger){
+    public VM_Main(byte[] program, GEngine_Functions Gapi, Logger logger, BiConsumer<Byte, byte[]> render_callback){
         this.program = program;
         this.Gapi = Gapi;
         this.context = new VM_Context();
-        this.vmOpcode.VM_context(Gapi);
+        this.vmOpcode.VM_context(Gapi, render_callback);
         this.vmOpcode.setLogger(logger);
         this.logger = logger;
+        this.context.register[1] = tick;
     }
 
     public void execute() throws InterruptedException {
         this.execOpcode = this.program[this.context.cursor];
         this.context.opcode_cursor = this.context.cursor;
-        this.execLenPayload = (
-                ((this.program[this.context.cursor + 1] & 0xFF) << 8) |
-                (this.program[this.context.cursor + 2] & 0xFF)
-        );
+        this.execLenPayload = ((this.program[this.context.cursor + 1] & 0x3F));
 
+        this.context.register[0] = (this.program[this.context.cursor + 1] >> 6);
         this.context.cursor += this.sizeHeaderBytes;
 
         this.execPayload = new byte[this.execLenPayload];
@@ -57,6 +58,32 @@ public class VM_Main {
 
     public void resetVM(boolean b) {
         this.context.cursor = 0;
+        for (int i = 0; i < this.context.register_u.length; i++){
+            this.context.register_u[i] = 0;
+            this.context.register[i] = 0;
+            this.context.register_flags[i] = false;
+        }
+        this.context.register[1] = tick;
+    }
+
+    public void update() throws InterruptedException {
+        //logger.LOGI("UPDATE");
+        long start = System.currentTimeMillis();
+        if (this.program.length != 0){
+            this.context.register_flags[7] = false;
+            this.context.register[2] += tick;
+            while (!this.context.register_flags[7]){
+                if (System.currentTimeMillis() - start > this.watchdog) {
+                    logger.LOGI("UPDATE WATCHDOG RESET");
+                    this.resetVM(false);
+                    break;
+                }
+
+                if (this.context.cursor < this.program.length){
+                    this.execute();
+                }
+            }
+        }
     }
 
     public int getOpcodeNowExec(){
@@ -64,6 +91,7 @@ public class VM_Main {
     }
 
     public void setTick(int new_tick){
+        this.context.register[1] = new_tick;
         this.tick = new_tick;
     }
 
@@ -92,5 +120,8 @@ public class VM_Main {
     }
     public boolean[] getDebugRegsFlags(){
         return this.context.register_flags;
+    }
+    public int[] getDebugRegsColor(){
+        return this.context.reg_ch_color;
     }
 }

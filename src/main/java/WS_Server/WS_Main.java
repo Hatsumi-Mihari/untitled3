@@ -11,7 +11,7 @@ public class WS_Main extends WebSocketServer{
     private byte[] byteData;
     private Consumer<byte[]> handlerProcessPKG;
     public WS_Main(int port){
-        super(new InetSocketAddress("127.0.0.1", port));
+        super(new InetSocketAddress("0.0.0.0", port));
     }
 
     @Override

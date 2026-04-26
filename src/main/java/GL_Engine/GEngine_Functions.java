@@ -15,8 +15,6 @@ public class GEngine_Functions{
         }
     }
 
-
-
     public void set_pixel_xy (int color, int[] pos){
         if (pos[0] > this.engine.size_x || pos[0] < 0) return;
         if (pos[1] > this.engine.size_y || pos[1] < 0) return;
@@ -59,6 +57,15 @@ public class GEngine_Functions{
         engine.pixel_fn_obj.get_unzip_pixel(RGB_R2, pixel_t);
         pixel_inter[3] = pixel_t[3];
 
+        int diffH = pixel_inter[0] - pixel_base[0];
+        if (Math.abs(diffH) > 128) {
+            if (pixel_inter[0] > pixel_base[0]) {
+                pixel_inter[0] -= 256;
+            } else {
+                pixel_inter[0] += 256;
+            }
+        }
+
         for (int y = pos1[1]; y <= pos2[1]; y++){
             int current_t = row_t;
             int row_offset = y * this.engine.size_x;
@@ -68,10 +75,10 @@ public class GEngine_Functions{
 
                 int alpha = t >> 8;
 
-                pixel_t[0] = pixel_base[0] + (alpha * (pixel_inter[0] - pixel_base[0]) >> 8);
-                pixel_t[1] = pixel_base[1] + (alpha * (pixel_inter[1] - pixel_base[1]) >> 8);
-                pixel_t[2] = pixel_base[2] + (alpha * (pixel_inter[2] - pixel_base[2]) >> 8);
-                pixel_t[3] = pixel_base[3] + (alpha * (pixel_inter[3] - pixel_base[3]) >> 8);
+                pixel_t[0] = (pixel_base[0] + (alpha * (pixel_inter[0] - pixel_base[0]) >> 8)) & 0xFF;
+                pixel_t[1] = (pixel_base[1] + (alpha * (pixel_inter[1] - pixel_base[1]) >> 8)) & 0xFF;
+                pixel_t[2] = (pixel_base[2] + (alpha * (pixel_inter[2] - pixel_base[2]) >> 8)) & 0xFF;
+                pixel_t[3] = (pixel_base[3] + (alpha * (pixel_inter[3] - pixel_base[3]) >> 8)) & 0xFF;
 
                 temp_point[0] = x;
                 temp_point[1] = y;
@@ -95,11 +102,42 @@ public class GEngine_Functions{
         }
     }
 
+    public void liner_brightness (int value) {
+        int[] color = new int[4];
+        for (int i = 0; i < this.engine.FBO.length; i++){
+            this.engine.pixel_fn_obj.get_unzip_pixel(this.engine.FBO[i],color);
+            color[0] = (color[0] * value) / 100;
+            color[1] = (color[1] * value) / 100;
+            color[2] = (color[2] * value) / 100;
+            this.engine.FBO[i] = this.engine.pixel_fn_obj.set_pixel(color[0], color[1], color[2], color[3]);
+        }
+    }
+
     public void SET_WINDOW(int x0, int y0, int x1, int y1){
         this.engine.set_window_draw(x0, y0, x1, y1);
     }
 
     public void resize_FBO(int x, int y){
         this.engine.resize_FBO(x,y);
+    }
+
+    public int c_encode_hls(int hue, int luma, int sat, int alpha){
+        return this.engine.pixel_fn_obj.set_pixel(hue, luma, sat, alpha);
+    }
+
+    public int hls_to_rgb(int color){
+        return this.engine.pixel_fn_obj.HSL_to_RGB(color);
+    }
+
+    public int rgb_to_hls(int color){
+        return this.engine.pixel_fn_obj.RGB_to_HLS(color);
+    }
+
+    public void decode_color(int[] c_decode, int color){
+        this.engine.pixel_fn_obj.get_unzip_pixel(color, c_decode);
+    }
+
+    public byte[] render_byte_fbo (){
+        return this.engine.render_ByteArr();
     }
 }

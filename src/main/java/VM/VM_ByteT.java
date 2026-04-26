@@ -15,4 +15,11 @@ public class VM_ByteT {
                 ((b[2] & 0xFF) << 8) |
                 (b[3] & 0xFF));
     }
+
+    public int BE32_encodeB(byte b1, byte b2, byte b3, byte b4){
+        return (((b1 & 0xFF) << 24) |
+                ((b2 & 0xFF) << 16) |
+                ((b3 & 0xFF) << 8) |
+                (b4 & 0xFF));
+    }
 }
